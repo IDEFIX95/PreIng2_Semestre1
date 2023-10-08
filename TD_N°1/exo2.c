@@ -8,8 +8,6 @@ typedef struct chainon{
     struct chainon * suivant;
 } Chainon;
 
-
-
 Chainon * creationChainon(int a){
     Chainon * nouveau =malloc(sizeof(Chainon));
     if (nouveau == NULL){
@@ -70,7 +68,7 @@ int main(){
             while(p1 -> suivant != NULL && p1 -> suivant -> element < changement_de_place -> element){
                 p1 = p1 -> suivant;
             }
-            //changement_de_place -> suivant = p1 -> suivant; 
+            changement_de_place -> suivant = p1 -> suivant; 
             p1 -> suivant = changement_de_place;
         }
 
