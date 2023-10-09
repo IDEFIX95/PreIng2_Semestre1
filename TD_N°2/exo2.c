@@ -10,32 +10,32 @@ typedef struct piledyn{
 }Piledyn;
 
 
+
 /* Question 2 */
 
-Piledyn * empiler(Piledyn * ppile,int nb){
+Piledyn * empiler(Piledyn * pile,int valeur){
     Piledyn * nouveau = malloc(sizeof(Piledyn));
     if(nouveau == NULL){
         printf("erreur");
         exit(1);
     }
-    nouveau -> element = nb;
-    nouveau -> suivant = ppile;
-    ppile = nouveau;
-    return ppile;
+    nouveau -> element = valeur;
+    nouveau -> suivant = pile;
+    pile = nouveau;
+    return pile;
 }
 
 void affichePile(Piledyn * pile){
     Piledyn * p = pile;
-    while(pile != NULL){
+    while(p != NULL){
         printf("%d\n", p ->element);
-        p -> suivant;
+        p = p -> suivant;
     }
 }
 
-
 void affichePileRecursif(Piledyn * pile){
     if(pile != NULL){
-        printf("%d\n", pile -> element);
+        printf("%d", pile -> element);
         affichePileRecursif(pile -> suivant);
     }
 }
@@ -54,6 +54,7 @@ Piledyn * depile(Piledyn * pile, int * pnmb){
     return pile;
 }
 
+
 Piledyn * pilepair(Piledyn * pile){
     Piledyn * p1 = pile;
     Piledyn * pile_pair = NULL;
@@ -64,7 +65,6 @@ Piledyn * pilepair(Piledyn * pile){
         }
         p1=p1->suivant;
     }
-    
     return pile_pair;
 }
 
@@ -73,32 +73,38 @@ Piledyn * pileimpair(Piledyn * pile){
 
 }
 
-int main(){
+int main() {
     /* Suite Question 2 */
     Piledyn * nouvelle_pile = NULL;
-    Piledyn * p1 = nouvelle_pile;
     Piledyn * nouvelle_pile_pair = NULL;
     Piledyn * nouvelle_pile_impair = NULL;
-    for(int i=1;i<21;i++){
-        nouvelle_pile = empiler(nouvelle_pile,i);
+
+    for (int i = 1; i < 21; i++) {
+        nouvelle_pile = empiler(nouvelle_pile, i);
     }
     affichePile(nouvelle_pile);
-    
 
-    while(depile(nouvelle_pile) != NULL){
-        while(p1 != NULL)
-        {
-            if(p1->element % 2 == 0){
-                nouvelle_pile_pair = empiler(nouvelle_pile_pair, p1->element);
-            }
-            else{
-                nouvelle_pile_impair = empiler(nouvelle_pile_impair, p1->element);
-            }
-        p1=p1->suivant;
+    printf("\n\n");
+
+
+    /* Question 6 */
+    while (nouvelle_pile != NULL) {
+        int valeur;
+        nouvelle_pile = depile(nouvelle_pile, &valeur);
+        if (valeur % 2 == 0) {
+            nouvelle_pile_pair = empiler(nouvelle_pile_pair, valeur);
+        } else {
+            nouvelle_pile_impair = empiler(nouvelle_pile_impair, valeur);
         }
     }
+
+    printf("Nouvelle pile des éléments pairs :\n");
     affichePile(nouvelle_pile_pair);
 
+    printf("\n\n");
+
+    printf("Nouvelle pile des éléments impairs :\n");
+    affichePile(nouvelle_pile_impair);
 
     return 0;
 }
