@@ -2,6 +2,8 @@
 #include <stdlib.h>
 
 
+#define MAX_TAILLE 100
+
 /* Question 1 */
 
 typedef struct piledyn{
@@ -9,33 +11,86 @@ typedef struct piledyn{
     struct piledyn * suivant;
 }Piledyn;
 
+typedef struct pilestat{
+    struct  tabPile[MAX_TAILLE];
+    int taille;
+    int tete;
+}Pilestat;
 
 
+Pilestat * creationPilestat(){
+    Pilestat * pile;
+    pile -> tete = -1;
+    return pile;
+}
+
+int verificationPilestat(Pilestat * pile){
+    int result = 0;
+    if(pile == NULL){
+        result = -1;
+    }
+    else if ((pile -> taille  < 0) || (pile- > tete < -1) || (pile -> tete > (pile->taille)-1 )){
+        result = -2;
+    }
+    return result;
+}
+
+/* A revoir */
+
+int empilagePilestat(Pilestat * pile, int element){
+    int result = 0;
+    result = verificationPilestat(pile);
+    if(result == 0){
+        if(pile->tete == (pile->taille)-1){
+            result = -1;
+        }
+        else{
+            pile->tete = pile->tete + 1;
+            pile->tabPile[tete] = element;
+        }
+    }
+    return result;
+}
+
+int depillagePileStat(Pilestat * pile, int * element){
+    int result = 0;
+    result = verificationPilestat(pile);
+    if(element == NULL){
+        result = -1;
+    }
+    if(result = 0){
+        if(pile -> tete = -1){
+            
+        }
+    }
+}
 /* Question 2 */
 
-Piledyn * empiler(Piledyn * pile,int valeur){
+Piledyn * empiler(Piledyn * ppile,int nb){
     Piledyn * nouveau = malloc(sizeof(Piledyn));
     if(nouveau == NULL){
         printf("erreur");
         exit(1);
     }
-    nouveau -> element = valeur;
-    nouveau -> suivant = pile;
-    pile = nouveau;
-    return pile;
+    nouveau -> element = nb;
+    nouveau -> suivant = ppile;
+    ppile = nouveau;
+    return ppile;
 }
+
 
 void affichePile(Piledyn * pile){
     Piledyn * p = pile;
     while(p != NULL){
-        printf("%d\n", p ->element);
+        printf("%d\n", p -> element);
         p = p -> suivant;
     }
 }
 
+
 void affichePileRecursif(Piledyn * pile){
     if(pile != NULL){
-        printf("%d", pile -> element);
+        printf("%d\n", pile -> element);
         affichePileRecursif(pile -> suivant);
     }
 }
@@ -55,27 +110,11 @@ Piledyn * depile(Piledyn * pile, int * pnmb){
 }
 
 
-Piledyn * pilepair(Piledyn * pile){
-    Piledyn * p1 = pile;
-    Piledyn * pile_pair = NULL;
-    while(p1 != NULL)
-    {
-        if(p1->element % 2 == 0){
-          pile_pair = empiler(pile_pair, p1->element);
-        }
-        p1=p1->suivant;
-    }
-    return pile_pair;
-}
-
-
-Piledyn * pileimpair(Piledyn * pile){
-
-}
-
 int main() {
     /* Suite Question 2 */
-    Piledyn * nouvelle_pile = NULL;
+
+    /* Fait à l'aide d'une pile dynamique */
+    /* Piledyn * nouvelle_pile = NULL;
     Piledyn * nouvelle_pile_pair = NULL;
     Piledyn * nouvelle_pile_impair = NULL;
 
@@ -87,9 +126,9 @@ int main() {
     printf("\n\n");
 
 
-    /* Question 6 */
+    int valeur;
+    
     while (nouvelle_pile != NULL) {
-        int valeur;
         nouvelle_pile = depile(nouvelle_pile, &valeur);
         if (valeur % 2 == 0) {
             nouvelle_pile_pair = empiler(nouvelle_pile_pair, valeur);
@@ -104,7 +143,19 @@ int main() {
     printf("\n\n");
 
     printf("Nouvelle pile des éléments impairs :\n");
-    affichePile(nouvelle_pile_impair);
+    affichePile(nouvelle_pile_impair);*/
+
+
+    /* Question 7 à l'aide d'une pile statique */
+
+    Pilestat* nouvelle_pile_stat = NULL;
+    Pilestat * nouvelle_pile_pair = NULL;
+    Pilestat * nouvelle_pile_impair = NULL;
+
+    for (int i = 1; i < 21; i++) {
+        nouvelle_pile_stat = empilerstat(nouvelle_pile_stat, i);
+    }
+    affichePile(nouvelle_pile_stat);
 
     return 0;
 }
