@@ -40,6 +40,18 @@ Chainon * insertDebut(Chainon * pliste, int a){
     return nouveau_chainon;
 }
 
+Chainon * insertFin(Chainon * pliste, int a){
+    Chainon * nouveau_chainon =creationChainon(a);
+    Chainon * p1 = pliste;
+    while(p1->suivant != NULL){
+        p1 = p1 -> suivant;
+    }
+    p1-> suivant = nouveau_chainon;
+    p1 = nouveau_chainon;
+    return pliste;
+}
+
+
 Chainon * inversionListe(Chainon * pliste1, Chainon * pliste2){
     Chainon * p1 = pliste1;
     while (p1 != NULL)
@@ -72,13 +84,10 @@ int main(){
     srand(time(NULL));
     int valeur = rand()%6;
     Chainon * nouvelle_liste = creationChainon(valeur);
-    Chainon * dernier_chainon = nouvelle_liste;
     for (int i = 0; i <9; i++)
     {
         int nouvelle_valeur = rand()%6;
-        Chainon * nouveau_chainon = creationChainon(nouvelle_valeur);
-        dernier_chainon ->suivant = nouveau_chainon;
-        dernier_chainon = nouveau_chainon;
+        nouvelle_liste = insertFin(nouvelle_liste,nouvelle_valeur);
     }
     afficheListe(nouvelle_liste);
     printf("\n");
