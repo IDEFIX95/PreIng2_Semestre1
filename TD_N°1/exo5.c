@@ -48,6 +48,27 @@ float moyTab(int * tab, size_t N){
     return (float)somme / N;
 }
 
+float moyPromo(LstEtudiants * lst){
+    Etudiant * etudiant = lst -> tete;
+    int total = 0;
+    float sommeMoy = 0;
+
+    while (etudiant != NULL)
+    {
+        sommeMoy += etudiant -> moy;
+        total += 1;
+        etudiant = etudiant -> suivant;
+    }
+
+    if (total == 0)
+    {
+        printf("Aucun étudiant dans la liste.\n");
+        return 0;
+    } else {
+        return sommeMoy / total;
+    }
+}
+
 void trouveEtudiant(char * nom, char * prenom, LstEtudiants * lst){
     Etudiant * etudiant = lst->tete;
     int etudiant_trouver = 0;
@@ -63,7 +84,28 @@ void trouveEtudiant(char * nom, char * prenom, LstEtudiants * lst){
         etudiant = etudiant -> suivant;
     }
     if (!etudiant_trouver) {
-        printf("\nAucun etudiant n'a été trouvé du Nom %s et Prenom %s\n",nom, prenom);
+        printf("\nAucun etudiant n'a été trouvé du Nom : %s et Prenom : %s\n",nom, prenom);
+    }
+}
+
+void etudiant_mauvaise_moy(LstEtudiants *lst){
+    Etudiant *etudiant = lst->tete;
+    float minMoyenne = 100; // Initialisation à une valeur supérieure à la moyenne maximale possible
+    Etudiant *etudiant_mauvaise = NULL; // Étudiant avec la moyenne la plus basse
+
+    while (etudiant != NULL){
+        if (etudiant->moy < minMoyenne){
+            minMoyenne = etudiant->moy;
+            etudiant_mauvaise = etudiant;
+        }
+        etudiant = etudiant->suivant;
+    }
+
+    if (etudiant_mauvaise != NULL){
+        printf("L'étudiant avec la moyenne la plus basse est %s %s avec une moyenne de %.2f\n", etudiant_mauvaise->Prenom, etudiant_mauvaise->Nom, etudiant_mauvaise->moy);
+    }
+    else {
+        printf("Aucun étudiant dans la liste.\n");
     }
 }
 
@@ -104,8 +146,7 @@ void saisirEtudiant(LstEtudiants * lst){
     else{
         moy = NAN;
     }
-
-    
+    printf("\n");
     
     Etudiant * nouveau_etudiant = creation_etudiants(Nom,Prenom,groupes,Notes,moy);
 
@@ -167,13 +208,15 @@ int main(){
     char demande_recherche_etudiant[5];
     char Nom[20];
     char Prenom[20];
+    char Nom_question7[20] = "Barnabus";
+    char Prenom_question7[20] = "Spiruline";
     int choix_numero_de_groupe;
     LstEtudiants * nouvelle_liste_etudiant = malloc(sizeof(LstEtudiants));
     nouvelle_liste_etudiant -> tete = NULL;
-    //for (int i = 0; i < 2; i++)
-    //{
+    for (int i = 0; i < 2; i++)
+    {
         saisirEtudiant(nouvelle_liste_etudiant);
-    //}
+    }
 
     printf("\n");
 
@@ -202,6 +245,17 @@ int main(){
     
     printf("\n");
 
+    trouveEtudiant(Nom_question7,Prenom_question7,nouvelle_liste_etudiant);
+
     afficheListe(nouvelle_liste_etudiant);
+
+    printf("\n");
+
+    printf("\nLa moyen de la promotion est de %.2f \n", moyPromo(nouvelle_liste_etudiant));
+
+    printf("\n");
+
+    etudiant_mauvaise_moy(nouvelle_liste_etudiant);
+
     return 0;
 }
