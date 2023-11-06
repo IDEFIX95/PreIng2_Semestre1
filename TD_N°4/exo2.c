@@ -1,18 +1,40 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 
-typedef struct arbre{           // Question 1
+typedef struct arbre{           // Question 1) a)
     int element;
     struct arbre * fils_gauche;
-    struct arbre * fils_droit
+    struct arbre * fils_droit;
 }Arbre;
 
+typedef Arbre * parbre;         // Question 1) b)
 
-typedef Arbre * parbre;         // Question 2
+typedef struct chainon{
+    parbre element;
+    struct chainon* suivant;
+}Chainon;
 
-parbre creerArbre(int a){                   // Question 3
-    parbre nouveau = malloc(sizeof(parbre));
+
+typedef struct file{  // Fait parti de la question sur les parcours (ici parcour en largeur)
+    Chainon  *queue;
+    Chainon  *tete;
+}File;
+
+
+File initfile(){  // parcour en largeur
+    File f;
+    f.tete=NULL;
+    f.queue=NULL;
+    return f;
+}
+
+
+
+
+parbre creerArbre(int a){                   // Question 1) c)
+    parbre nouveau = malloc(sizeof(Arbre));
     if(nouveau == NULL){
         return NULL;
     }
@@ -20,11 +42,10 @@ parbre creerArbre(int a){                   // Question 3
     nouveau -> element = a;
     nouveau -> fils_droit = NULL;
     nouveau -> fils_gauche = NULL;
-
     return nouveau;
 }
 
-int estVide(parbre a){              // Question 4
+int estVide(parbre a){              // Question 1) d)
     if(a == NULL){
         return 1;
     }
@@ -33,52 +54,186 @@ int estVide(parbre a){              // Question 4
     }
 }
 
-int estFeuille(parbre a){           // Question 5
+int estFeuille(parbre a){           // Question 1) e)
     if( (a->fils_droit == NULL) && (a->fils_gauche == NULL) ){
-        return 1
+        return 1;
     }
     else{
         return 0;
     }
 }
 
-int element(parbre a){      // Question 6
+int element(parbre a){      // Question 1 f)
     if (a != NULL ){
         return a->element;
     }              
 }
 
 
-pArbre existeFilsGauche(pArbre a){    // Question 7
-    if(estVide(a)){
+int existeFilsGauche(parbre a){    // Question 1) g)
+    if(a == NULL){
         printf("l'arbre est vide");
-        return NULL;
-    }
-    if( a->fils_gauche == NULL ){
-        return 1;
-    }
-    else{
         return 0;
     }
-}
-
-pArbre existeFilsDroit(pArbre a){
-    if(estVide(a)){
-        printf("l'arbre est vide");
-        return NULL;
-    }
-    if( a->fils_droit == NULL ){
-        return 1;
-    }
-    else{
+    else if( a->fils_gauche == NULL ){
         return 0;
     }
+    else{
+        return 1;
+    }
+}
+
+int existeFilsDroit(parbre a){
+    if(a == NULL){
+        printf("l'arbre est vide");
+        return 0;
+    }
+    else if( a->fils_droit == NULL ){
+        return 0;
+    }
+    else{
+        return 1;
+    }
 }
 
 
-pArbre ajouterFilsGauche(pArbre a, int e){
-    
+parbre ajouterFilsGauche(parbre a, int e){     // Question 1) h)
+    parbre nouveau;
+    if(existeFilsGauche(a)){
+        return a;
+    }
+    nouveau = creerArbre(e);
+    a->fils_gauche = nouveau;
+    return a;
+}
+
+parbre ajouterFilsDroit(parbre a, int e){
+    parbre nouveau;
+    if(existeFilsDroit(a)){
+        return a;
+    }
+    nouveau = creerArbre(e);
+    a->fils_droit = nouveau;
+    return a;
+}
+
+void traiter(parbre arbre)
+{
+    printf("%d ",arbre->element);
+}
+
+
+Chainon *creationchainon(parbre a){
+    Chainon *c = malloc(sizeof(Chainon));
+    if(c==NULL){
+        exit(1);
+    }
+    c->element=a;
+    c->suivant=NULL;
+    return c;
+}
+
+
+int verificationFile(File *file){
+    int result=0;
+    if(file==NULL){
+        result=-1;
+    }
+    else if(((file->tete==NULL && file->queue != NULL) && (file->queue==NULL && file->tete != NULL))){
+        result=-2;
+    }
+    else if(((file->queue) != NULL) && ((file->queue->suivant) != NULL)){
+        result=-3;
+    }
+    return result;
+}
+
+
+int enfiler(File *file,parbre nb){
+    Chainon *nouveau;
+    int result = 0;
+    result=verificationFile(file);
+    if(result>-2){
+        nouveau=creationchainon(nb);
+        nouveau->suivant = NULL;
+        if(file->queue==NULL){
+            file->tete=nouveau;
+            file->queue=nouveau;
+        }
+        else{
+            file->queue->suivant=nouveau;
+            file->queue=nouveau;
+        }
+    }
+    return result;
+}
+
+
+int defiler(File *file, parbre *nb){
+    Chainon * c= file->tete;
+    int result=0;
+    result=verificationFile(file);
+    if(result==0){
+        if(file->tete ==NULL && file->queue==NULL){
+            result=1;
+            printf("NULL");
+        }
+        if(file->tete == file->queue){
+            *nb=file->tete->element;
+            file->queue=NULL;
+            file->tete=NULL;
+            free(c);
+        }
+        else{
+        *nb=file->tete->element;
+        file->tete=file->tete->suivant;
+        free(c);
+        }
+    }
+    return result;
 }
 
 
 
+void parcourLargeur(parbre a){
+    File nouveaufile=initfile();
+    parbre noeud=a;
+    if(!estVide(a)){
+        enfiler(&nouveaufile,a);
+        while(nouveaufile.queue!=NULL && nouveaufile.tete!=NULL){
+            defiler(&nouveaufile,&noeud);
+            traiter(noeud);
+            if(existeFilsGauche(noeud)){
+                enfiler(&nouveaufile,noeud->fils_gauche);
+            } 
+            if(existeFilsDroit(noeud)){
+                enfiler(&nouveaufile,noeud->fils_droit);
+            }
+        }
+    }
+}
+
+
+
+int main(){
+
+    parbre nouveau_arbre = creerArbre(1);       // Question 1) i)
+    parbre noeud_suivant = nouveau_arbre;
+    ajouterFilsDroit(nouveau_arbre,8);
+    ajouterFilsGauche(nouveau_arbre,2);
+    noeud_suivant = nouveau_arbre -> fils_gauche;
+    ajouterFilsGauche(noeud_suivant,3);
+    ajouterFilsDroit(noeud_suivant,6);
+    noeud_suivant = noeud_suivant -> fils_gauche;
+    ajouterFilsGauche(noeud_suivant,4);
+    ajouterFilsDroit(noeud_suivant,5);
+    noeud_suivant = nouveau_arbre -> fils_gauche;
+    noeud_suivant = noeud_suivant -> fils_droit;
+    ajouterFilsDroit(noeud_suivant,7);
+    noeud_suivant = nouveau_arbre -> fils_droit;
+    ajouterFilsDroit(noeud_suivant,10);
+    ajouterFilsGauche(noeud_suivant,9);
+
+    parcourLargeur(nouveau_arbre);
+    return 0;
+}
