@@ -3,6 +3,8 @@
 #include <stdbool.h>
 
 
+/* 1 : CONSTRUCTION DE L'ARBRE */
+
 typedef struct arbre{           // Question 1) a)
     int element;
     struct arbre * fils_gauche;
@@ -10,26 +12,6 @@ typedef struct arbre{           // Question 1) a)
 }Arbre;
 
 typedef Arbre * parbre;         // Question 1) b)
-
-typedef struct chainon{
-    parbre element;
-    struct chainon* suivant;
-}Chainon;
-
-
-typedef struct file{  // Fait parti de la question sur les parcours (ici parcour en largeur)
-    Chainon  *queue;
-    Chainon  *tete;
-}File;
-
-
-File initfile(){  // parcour en largeur
-    File f;
-    f.tete=NULL;
-    f.queue=NULL;
-    return f;
-}
-
 
 
 
@@ -117,13 +99,60 @@ parbre ajouterFilsDroit(parbre a, int e){
     return a;
 }
 
-void traiter(parbre arbre)
+
+/* 2 : PARCOURS DE L'ARBRE */
+
+typedef struct chainon{
+    parbre element;
+    struct chainon* suivant;
+}Chainon;
+
+
+typedef struct file{  // Fait parti de la question sur les parcours (ici parcour en largeur)  Question 2) d)
+    Chainon  *queue;
+    Chainon  *tete;
+}File;
+
+
+File initfile(){  // parcour en largeur
+    File f;
+    f.tete=NULL;
+    f.queue=NULL;
+    return f;
+}
+
+void traiter(parbre arbre)        // Question 2) a)
 {
     printf("%d ",arbre->element);
 }
 
 
-Chainon *creationchainon(parbre a){
+void parcourPrefixe(parbre arbre){          // Question 2) b)
+    if(!estVide(arbre)){
+        traiter(arbre);
+        parcourPrefixe(arbre->fils_gauche);
+        parcourPrefixe(arbre->fils_droit);
+    }
+}
+
+void parcourInfixe(parbre arbre){
+    if(!estVide(arbre)){
+        parcourInfixe(arbre->fils_gauche);
+        traiter(arbre);
+        parcourInfixe(arbre->fils_droit);
+    }
+}
+
+void parcourPostefixe(parbre arbre){       // Question 2) c)
+    parbre noeud = arbre;
+    if(!estVide(arbre)){
+        parcourPostefixe(noeud->fils_gauche);
+        parcourPostefixe(noeud->fils_droit);
+        traiter(noeud);
+    }
+}
+
+Chainon *creationchainon(parbre a){       // Question 2) d)
     Chainon *c = malloc(sizeof(Chainon));
     if(c==NULL){
         exit(1);
@@ -214,6 +243,13 @@ void parcourLargeur(parbre a){
 }
 
 
+/* 3 : MODIFICATION DE L'ARBRE */
+
+
+parbre modifierRacine(parbre a, int e){
+    a -> element = e;
+    return a;
+}
 
 int main(){
 
@@ -234,6 +270,9 @@ int main(){
     ajouterFilsDroit(noeud_suivant,10);
     ajouterFilsGauche(noeud_suivant,9);
 
-    parcourLargeur(nouveau_arbre);
+    //parcourLargeur(nouveau_arbre);   // Question 2) f)
+    //parcourPrefixe(nouveau_arbre);  // Question 2) c)
+    //parcourInfixe(nouveau_arbre);
+    //parcourPostefixe(nouveau_arbre);  // Question 2) d)
     return 0;
 }
