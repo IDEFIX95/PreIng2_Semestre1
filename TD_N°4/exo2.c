@@ -247,8 +247,28 @@ void parcourLargeur(parbre a){
 
 
 parbre modifierRacine(parbre a, int e){
-    a -> element = e;
+    if(a == NULL ){
+        erreur();
+    }
+    else{
+        a -> element = e;
     return a;
+    }
+}
+
+parbre supprimerFilsGauche(parbre a){
+    if(a == NULL){
+        exit(1);
+    }
+    else if(existeFilsGauche(a)){
+        if(existeFilsGauche(a->fils_gauche)){
+            supprimerFilsGauche(a->fils_gauche);
+        }
+        if(existeFilsDroit(a->fils_gauche)){
+            supprimerFilsDroit(a->fils_gauche);
+        }
+        free(a->fils_gauche);
+    }
 }
 
 int main(){
