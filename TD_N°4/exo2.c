@@ -1,18 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-
+#include "exo2.h" 
 
 /* 1 : CONSTRUCTION DE L'ARBRE */
-
-typedef struct arbre{           // Question 1) a)
-    int element;
-    struct arbre * fils_gauche;
-    struct arbre * fils_droit;
-}Arbre;
-
-typedef Arbre * parbre;         // Question 1) b)
-
 
 
 parbre creerArbre(int a){                   // Question 1) c)
@@ -48,7 +39,10 @@ int estFeuille(parbre a){           // Question 1) e)
 int element(parbre a){      // Question 1 f)
     if (a != NULL ){
         return a->element;
-    }              
+    }    
+    else{
+        return -1;
+    }          
 }
 
 
@@ -101,17 +95,6 @@ parbre ajouterFilsDroit(parbre a, int e){
 
 
 /* 2 : PARCOURS DE L'ARBRE */
-
-typedef struct chainon{
-    parbre element;
-    struct chainon* suivant;
-}Chainon;
-
-
-typedef struct file{  // Fait parti de la question sur les parcours (ici parcour en largeur)  Question 2) d)
-    Chainon  *queue;
-    Chainon  *tete;
-}File;
 
 
 File initfile(){  // parcour en largeur
@@ -248,7 +231,7 @@ void parcourLargeur(parbre a){
 
 parbre modifierRacine(parbre a, int e){
     if(a == NULL ){
-        erreur();
+        exit(1);
     }
     else{
         a -> element = e;
@@ -256,18 +239,107 @@ parbre modifierRacine(parbre a, int e){
     }
 }
 
-parbre supprimerFilsGauche(parbre a){
-    if(a == NULL){
+void supprimerFilsGauche(parbre a) {
+    if (a == NULL) {
         exit(1);
-    }
-    else if(existeFilsGauche(a)){
-        if(existeFilsGauche(a->fils_gauche)){
+    } else if (existeFilsGauche(a)) {
+        if (existeFilsGauche(a->fils_gauche)) {
             supprimerFilsGauche(a->fils_gauche);
         }
-        if(existeFilsDroit(a->fils_gauche)){
+        if (existeFilsDroit(a->fils_gauche)) {
             supprimerFilsDroit(a->fils_gauche);
         }
         free(a->fils_gauche);
+        a->fils_gauche = NULL; // Ajout pour éviter des problèmes potentiels
+    }
+}
+
+void supprimerFilsDroit(parbre a) {
+    if (a == NULL) {
+        exit(1);
+    } else if (existeFilsDroit(a)) {
+        if (existeFilsGauche(a->fils_droit)) {
+            supprimerFilsGauche(a->fils_droit);
+        }
+        if (existeFilsDroit(a->fils_droit)) {
+            supprimerFilsDroit(a->fils_droit);
+        }
+        free(a->fils_droit);
+        a->fils_droit = NULL; // Ajout pour éviter des problèmes potentiels
+    }
+}
+
+
+parbre supprimerPos(parbre a, int valeur) {
+    if (a == NULL) {
+        return NULL;
+    }
+
+    if (a->element == valeur) {
+        // Noeud trouvé, supprimer ce noeud
+        // Cas 1 : Noeud sans fils
+        if (a->fils_gauche == NULL && a->fils_droit == NULL) {
+            free(a);
+            return NULL;
+        }
+        // Cas 2 : Noeud avec un fils (gauche ou droit)
+        else if (a->fils_gauche == NULL) {
+            parbre temp = a->fils_droit;
+            free(a);
+            return temp;
+        } else if (a->fils_droit == NULL) {
+            parbre temp = a->fils_gauche;
+            free(a);
+            return temp;
+        }
+        // Cas 3 : Noeud avec deux fils
+        else {
+            parbre successeur = a->fils_droit;
+            while (successeur->fils_gauche != NULL) {
+                successeur = successeur->fils_gauche;
+            }
+            a->element = successeur->element;
+            a->fils_droit = supprimerPos(a->fils_droit, successeur->element);
+        }
+    } else if (valeur < a->element) {
+        a->fils_gauche = supprimerPos(a->fils_gauche, valeur);
+    } else {
+        a->fils_droit = supprimerPos(a->fils_droit, valeur);
+    }
+
+    return a;
+}
+
+
+int nmbfeuille(parbre a){
+    if(a == NULL){
+        return 0;
+    }
+    if(estFeuille(a)){
+        return 1;
+    }
+    return nmbfeuille(a->fils_droit) + nmbfeuille(a->fils_gauche);
+}
+
+int taille(parbre a){
+    if(a == NULL){
+        return 0;
+    }
+    if(!(estFeuille(a))){
+        return taille(a->fils_droit) + taille(a->fils_gauche);
+    }
+    return 1;
+}
+
+int hauteurarbre(parbre a){
+    if(a == NULL){
+        return -1;
+    }
+    else {
+        int hauteurGauche = hauteur(a->fils_gauche);
+        int hauteurDroit = hauteur(a->fils_droit);
+
+        return 1 + max(hauteurGauche, hauteurDroit);
     }
 }
 
@@ -294,5 +366,14 @@ int main(){
     //parcourPrefixe(nouveau_arbre);  // Question 2) c)
     //parcourInfixe(nouveau_arbre);
     //parcourPostefixe(nouveau_arbre);  // Question 2) d)
+
+    //supprimerFilsGauche(nouveau_arbre);
+    //supprimerPos(nouveau_arbre, 15);
+    
+    printf("%d ",nmbfeuille(nouveau_arbre));
+    printf("\n");
+    printf("%d ",taille(nouveau_arbre));
+    printf("\n");
+    parcourPrefixe(nouveau_arbre);
     return 0;
 }
